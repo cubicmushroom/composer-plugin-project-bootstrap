@@ -4,7 +4,7 @@
  * Created: 15/05/2016
  */
 
-namespace CubicMushroom\Composer\Plugin;
+namespace CubicMushroom\Composer\Plugin\ProjectBootstrap;
 
 use Composer\Composer;
 use Composer\IO\IOInterface;
@@ -18,7 +18,7 @@ use CubicMushroom\Composer\Plugin\ProjectBootstrap\CommandProvider as ProjectBoo
  *
  * @package CubicMushroom\Composer\Plugin\ProjectBootstrap
  */
-class ProjectBootstrap implements PluginInterface, Capable
+class ProjectBootstrapPlugin implements PluginInterface, Capable
 {
     /**
      * Apply plugin modifications to Composer
