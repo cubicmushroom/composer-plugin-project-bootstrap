@@ -19,7 +19,7 @@ class CommandProvider implements CommandProviderCapability
 {
 
     /**
-     * Retreives an array of commands
+     * Retrieves an array of commands
      *
      * @return BaseCommand[]
      */
