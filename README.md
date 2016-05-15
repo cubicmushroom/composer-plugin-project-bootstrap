@@ -1,1 +1,1 @@
-# CM Composer Project Bootstrap Plugin #
+# Composer Project Bootstrap Plugin #
