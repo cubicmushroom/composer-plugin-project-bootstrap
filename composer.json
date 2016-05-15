@@ -10,11 +10,11 @@
         "composer/composer": "^1.1"
     },
     "autoload": {
-        "psr-4": {
-            "CubicMushroom\\Composer\\Plugin\\": "src/"
+        "psr-0": {
+            "CubicMushroom\\": "src/"
         }
     },
     "extra": {
-        "class": "CubicMushroom\\Composer\\Plugin\\ProjectBootstrap"
+        "class": "CubicMushroom\\Composer\\Plugin\\ProjectBootstrap\\ProjectBootstrapPlugin"
     }
 }
