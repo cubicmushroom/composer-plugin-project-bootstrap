@@ -6,9 +6,12 @@
     "require": {
         "composer-plugin-api": "^1.0"
     },
+    "require-dev": {
+        "composer/composer": "^1.1"
+    },
     "autoload": {
         "psr-4": {
-            "CubicMushroom\\Composer\\Plugin": "src/"
+            "CubicMushroom\\Composer\\Plugin\\": "src/"
         }
     },
     "extra": {
