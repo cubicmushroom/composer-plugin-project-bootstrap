@@ -8,6 +8,7 @@ namespace CubicMushroom\Composer\Plugin\ProjectBootstrap;
 
 use Composer\Command\BaseCommand;
 use Composer\Plugin\Capability\CommandProvider as CommandProviderCapability;
+use CubicMushroom\Composer\Plugin\ProjectBootstrap\Command\BootstrapCommand;
 
 /**
  * Registered additional composer commands
@@ -24,6 +25,6 @@ class CommandProvider implements CommandProviderCapability
      */
     public function getCommands()
     {
-        return [];
+        return [new BootstrapCommand()];
     }
 }
