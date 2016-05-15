@@ -22,7 +22,7 @@ class BootstrapCommand extends BaseCommand
      */
     protected function configure()
     {
-        $this->setName('bootstrap')
+        $this->setName('cm:bootstrap-project')
              ->setDescription('Bootstraps a new project');
     }
 
