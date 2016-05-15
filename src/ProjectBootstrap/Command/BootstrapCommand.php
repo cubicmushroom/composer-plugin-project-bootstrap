@@ -7,6 +7,7 @@
 namespace CubicMushroom\Composer\Plugin\ProjectBootstrap\Command;
 
 use Composer\Command\BaseCommand;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -23,7 +24,9 @@ class BootstrapCommand extends BaseCommand
     protected function configure()
     {
         $this->setName('cm:bootstrap-project')
-             ->setDescription('Bootstraps a new project');
+             ->setDescription('Bootstraps a new project')
+             ->addArgument('dir', InputArgument::OPTIONAL, 'The directory to bootstrap the new project into')
+             ->setHelp('Help is here!');
     }
 
 
