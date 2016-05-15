@@ -7,6 +7,7 @@
 namespace CubicMushroom\Composer\Plugin\ProjectBootstrap\Command;
 
 use Composer\Command\BaseCommand;
+use CubicMushroom\Composer\Plugin\ProjectBootstrap\Exception\Filesystem\UnsupportedDirectoryPathException;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
@@ -64,34 +65,38 @@ class BootstrapCommand extends BaseCommand
         $this->input  = $input;
         $this->output = $output;
 
-        $this->info([
-            "****************************",
-            "* Boostrapping new project *",
-            "****************************",
-        ]);
+        $this->info(
+            [
+                '',
+                "****************************",
+                "* Boostrapping new project *",
+                "****************************",
+                '',
+            ]
+        );
 
         $dir = $this->getDirectory();
 
-        if ($output->isVerbose()) {
-            $this->info(sprintf('Installing into %s', $dir));
-        }
+        $this->info(sprintf('Installing into %s', $dir->getPathname()));
     }
 
 
     /**
      * Gets the directory for the project from either the input argument, or asks for it
      *
-     * @return string
+     * @return \SplFileInfo
      */
     protected function getDirectory()
     {
         $dir = $this->input->getArgument(self::INPUT_ARG_DIR);
 
-        if (is_null($dir)) {
+        if (!is_null($dir)) {
+            $dir = $this->validateAndConvertDirectoryPath($dir, getcwd());
+        } else {
             $dir = $this->askForDirectory();
         }
 
-        return $dir;
+        return new \SplFileInfo($dir);
     }
 
 
@@ -107,22 +112,44 @@ class BootstrapCommand extends BaseCommand
         do {
             $dir = $this->question('Which directory would you like to setup your new project in?', $cwd);
 
-            if ('~' === $dir[0]) {
-                $this->error(
-                    'You cannot use \'~\' for your home directory.  Please use the full absolute, or relative ' .
-                    'directory path'
-                );
+            try {
+                $dir = $this->validateAndConvertDirectoryPath($dir, $cwd);
+            } catch (UnsupportedDirectoryPathException $e) {
+                // Set to false to re-prompt for dir
+                $dir = false;
             }
 
-            // Convert relative paths to absolute ones
-            if ('/' !== $dir[0]) {
-                $dir = rtrim($cwd, '/') . '/' . $dir;
-            }
+        } while (!$dir || !$this->confirm("Install to directory {$dir}?"));
 
-            // remove . parts
-            $dir = str_replace('/.', '', $dir);
+        return $dir;
+    }
 
-        } while (!$this->confirm("Install to directory {$dir}?"));
+
+    /**
+     * @param string $dir
+     * @param string $cwd
+     *
+     * @return string
+     *
+     * @throws UnsupportedDirectoryPathException if '~' is used in the path
+     */
+    protected function validateAndConvertDirectoryPath($dir, $cwd)
+    {
+        if (false !== strpos($dir, '~')) {
+            $this->error(
+                'For safety, you cannot use \'~\' your directory path.  Please use the full absolute, or relative ' .
+                "directory path.\n"
+            );
+            throw UnsupportedDirectoryPathException::create(new \SplFileInfo($dir));
+        }
+
+        // Convert relative paths to absolute ones
+        if ('/' !== $dir[0]) {
+            $dir = rtrim($cwd, '/') . '/' . $dir;
+        }
+
+        // remove . parts
+        $dir = str_replace('/.', '', $dir);
 
         return $dir;
     }
