@@ -1,0 +1,12 @@
+{
+    "name": "cubicmushroom/composer-plugin-project-bootstrap",
+    "description": "Composer plugin to bootstrap projects",
+    "type": "composer-plugin",
+    "license": "MIT",
+    "require": {
+        "composer-plugin-api": "^1.0"
+    },
+    "extra": {
+        "class": "CubicMushroom\\Composer\\Plugin\\ProjectBootstrap"
+    }
+}
