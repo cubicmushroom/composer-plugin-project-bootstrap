@@ -6,6 +6,11 @@
     "require": {
         "composer-plugin-api": "^1.0"
     },
+    "autoload": {
+        "psr-4": {
+            "CubicMushroom\\Composer\\Plugin": "src/"
+        }
+    },
     "extra": {
         "class": "CubicMushroom\\Composer\\Plugin\\ProjectBootstrap"
     }
