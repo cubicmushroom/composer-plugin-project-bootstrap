@@ -70,6 +70,7 @@ class SplFileInfo extends \SplFileInfo
      * @param string $cwd
      *
      * @return static
+     *
      * @throws ProblematicPathException if a '~' is detected in the path
      */
     public function resolvePathToNew($cwd)
