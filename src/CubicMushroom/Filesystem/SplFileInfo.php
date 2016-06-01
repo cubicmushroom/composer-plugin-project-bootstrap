@@ -29,6 +29,20 @@ class SplFileInfo extends \SplFileInfo
     {
         $path = $this->getPathname();
 
+        // Resolve '~'
+        $path = preg_replace_callback(
+            '#^~#',
+            function () {
+                $home = getenv('HOME');
+                if (false === $home) {
+                    throw new HomeDirectoryNotAvailableException();
+                }
+
+                return $home;
+            },
+            $path
+        );
+
         if ('/' !== $path[0]) {
             $path = rtrim($cwd, '/') . '/' . $path;
         }
@@ -40,21 +54,6 @@ class SplFileInfo extends \SplFileInfo
 
         // Strip '.'s
         $path = preg_replace('#/\.(/|$)#', '', $path);
-
-        // Resolve '~'
-        $path = preg_replace_callback(
-            '#^~#',
-            function () {
-                var_dump([__LINE__, func_get_args()]);
-                $home = getenv('HOME');
-                if (false === $home) {
-                    throw new HomeDirectoryNotAvailableException();
-                }
-
-                return $home;
-            },
-            $path
-        );
 
         // Warn against '~' directories?
         if (!$ignoreWarnings && preg_match('#/~(/|$)#', $path)) {
