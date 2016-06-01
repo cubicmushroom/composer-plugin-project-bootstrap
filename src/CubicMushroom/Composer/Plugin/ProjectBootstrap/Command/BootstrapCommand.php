@@ -8,6 +8,7 @@ namespace CubicMushroom\Composer\Plugin\ProjectBootstrap\Command;
 
 use Composer\Command\BaseCommand;
 use CubicMushroom\Composer\Plugin\ProjectBootstrap\Exception\Filesystem\UnsupportedDirectoryPathException;
+use CubicMushroom\Filesystem\SplFileInfo;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
@@ -85,6 +86,8 @@ class BootstrapCommand extends BaseCommand
      * Gets the directory for the project from either the input argument, or asks for it
      *
      * @return \SplFileInfo
+     *
+     * @throws UnsupportedDirectoryPathException if the path given on the input is problematic
      */
     protected function getDirectory()
     {
@@ -103,7 +106,7 @@ class BootstrapCommand extends BaseCommand
     /**
      * Asks the user for the directory to use
      *
-     * @return string
+     * @return SplFileInfo
      */
     protected function askForDirectory()
     {
@@ -119,7 +122,7 @@ class BootstrapCommand extends BaseCommand
                 $dir = false;
             }
 
-        } while (!$dir || !$this->confirm("Install to directory {$dir}?"));
+        } while (empty($dir) || !$this->confirm("Install to directory {$dir}?"));
 
         return $dir;
     }
@@ -129,27 +132,14 @@ class BootstrapCommand extends BaseCommand
      * @param string $dir
      * @param string $cwd
      *
-     * @return string
+     * @return SplFileInfo
      *
      * @throws UnsupportedDirectoryPathException if '~' is used in the path
      */
     protected function validateAndConvertDirectoryPath($dir, $cwd)
     {
-        if (false !== strpos($dir, '~')) {
-            $this->error(
-                'For safety, you cannot use \'~\' your directory path.  Please use the full absolute, or relative ' .
-                "directory path.\n"
-            );
-            throw UnsupportedDirectoryPathException::create(new \SplFileInfo($dir));
-        }
-
-        // Convert relative paths to absolute ones
-        if ('/' !== $dir[0]) {
-            $dir = rtrim($cwd, '/') . '/' . $dir;
-        }
-
-        // remove . parts
-        $dir = str_replace('/.', '', $dir);
+        // Resolve the path
+        $dir = (new SplFileInfo($dir))->resolvePathToNew($cwd);
 
         return $dir;
     }
@@ -193,6 +183,27 @@ class BootstrapCommand extends BaseCommand
      */
     protected function question($questionText, $defaultValue)
     {
+        $question = $this->prepareQuestion($questionText, $defaultValue);
+
+        $answer = $this->getQuestionHelper()->ask($this->input, $this->output, $question);
+
+        // Add blank line afterwards
+        $this->output->writeln('');
+
+        return $answer;
+    }
+
+
+    /**
+     * Prepares a question, with it's default answer
+     *
+     * @param string $questionText
+     * @param string $defaultValue
+     *
+     * @return Question
+     */
+    protected function prepareQuestion($questionText, $defaultValue)
+    {
         $question = new Question(
             sprintf(
                 '<question>' . $questionText . ".</question>\n<info>[%s]</info>: ",
@@ -201,12 +212,7 @@ class BootstrapCommand extends BaseCommand
             $defaultValue
         );
 
-        $answer = $this->getQuestionHelper()->ask($this->input, $this->output, $question);
-
-        // Add blank line afterwards
-        $this->output->writeln('');
-
-        return $answer;
+        return $question;
     }
 
 
