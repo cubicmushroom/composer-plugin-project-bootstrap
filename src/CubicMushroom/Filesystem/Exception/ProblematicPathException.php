@@ -14,20 +14,20 @@ namespace CubicMushroom\Filesystem\Exception;
 class ProblematicPathException extends Exception
 {
     /**
-     * @var string
+     * @var \SplFileInfo
      */
     protected $path;
 
 
     /**
-     * @param string          $path
+     * @param \SplFileInfo    $path
      * @param string          $message
      * @param int             $code
      * @param \Exception|null $previous
      *
      * @return ProblematicPathException
      */
-    public static function create($path, $message = "", $code = 0, \Exception $previous = null)
+    public static function create(\SplFileInfo $path, $message = "", $code = 0, \Exception $previous = null)
     {
         if (empty($message)) {
             $message = "It looks like there might be a problem with your path ({$path})";
@@ -42,7 +42,7 @@ class ProblematicPathException extends Exception
 
 
     /**
-     * @return string
+     * @return \SplFileInfo
      */
     public function getPath()
     {
