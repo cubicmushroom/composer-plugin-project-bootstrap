@@ -23,6 +23,7 @@ class SplFileInfo extends \SplFileInfo
      * @param bool   $ignoreWarnings If set to true, will not warn when problems detected
      *
      * @return string
+     * 
      * @throws ProblematicPathException if a '~' is detected in the path
      */
     public function resolvePath($cwd, $ignoreWarnings = false)
