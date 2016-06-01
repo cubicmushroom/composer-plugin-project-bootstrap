@@ -17,7 +17,6 @@ use CubicMushroom\Composer\Plugin\ProjectBootstrap\Command\BootstrapCommand;
  */
 class CommandProvider implements CommandProviderCapability
 {
-
     /**
      * Retrieves an array of commands
      *
