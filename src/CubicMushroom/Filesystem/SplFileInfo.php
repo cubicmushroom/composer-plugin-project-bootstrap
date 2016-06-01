@@ -17,28 +17,35 @@ use CubicMushroom\Filesystem\Exception\ProblematicPathException;
 class SplFileInfo extends \SplFileInfo
 {
     /**
-     * Resolves the path by removing '..' and '.' notation & converting '~' to the user's home directory, if available
+     * Resolves the path by making absolute, removing '..' and '.' notation & converting '~' to the user's home directory, if available
      *
-     * @param bool $ignoreWarnings If set to true, will not warn when problems detected
+     * @param string $cwd
+     * @param bool   $ignoreWarnings If set to true, will not warn when problems detected
      *
      * @return string
-     * 
      * @throws ProblematicPathException if a '~' is detected in the path
      */
-    public function resolvePath($ignoreWarnings = false)
+    public function resolvePath($cwd, $ignoreWarnings = false)
     {
         $path = $this->getPathname();
 
+        if ('/' !== $path[0]) {
+            $path = rtrim($cwd, '/') . '/' . $path;
+        }
+
         // Strip '..'s
-        $path = preg_replace('#/[^/]+/..(/|$)#', '', $path);
+        while (preg_match('#/[^/]+/\.\.(/|$)#', $path)) {
+            $path = preg_replace('#/[^/]+/\.\.(/|$)#', '', $path);
+        }
 
         // Strip '.'s
-        $path = preg_replace('#/.(/|$)#', '', $path);
+        $path = preg_replace('#/\.(/|$)#', '', $path);
 
         // Resolve '~'
         $path = preg_replace_callback(
             '#^~#',
             function () {
+                var_dump([__LINE__, func_get_args()]);
                 $home = getenv('HOME');
                 if (false === $home) {
                     throw new HomeDirectoryNotAvailableException();
@@ -51,9 +58,23 @@ class SplFileInfo extends \SplFileInfo
 
         // Warn against '~' directories?
         if (!$ignoreWarnings && preg_match('#/~(/|$)#', $path)) {
-            throw ProblematicPathException::create($path, 'Path contains a \'~\' and might cause a problem');
+            throw ProblematicPathException::create(new SplFileInfo($path), 'Path contains a \'~\' and might cause a problem');
         }
 
         return $path;
+    }
+
+
+    /**
+     * Resolves the path & returns it as a new SplFileInfo object
+     *
+     * @param string $cwd
+     *
+     * @return static
+     * @throws ProblematicPathException if a '~' is detected in the path
+     */
+    public function resolvePathToNew($cwd)
+    {
+        return new static($this->resolvePath($cwd));
     }
 }
