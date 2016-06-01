@@ -7,7 +7,7 @@
 namespace CubicMushroom\Composer\Plugin\ProjectBootstrap\Command;
 
 use Composer\Command\BaseCommand;
-use CubicMushroom\Composer\Plugin\ProjectBootstrap\Exception\Filesystem\UnsupportedDirectoryPathException;
+use CubicMushroom\Filesystem\Exception\ProblematicPathException;
 use CubicMushroom\Filesystem\SplFileInfo;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -87,7 +87,7 @@ class BootstrapCommand extends BaseCommand
      *
      * @return \SplFileInfo
      *
-     * @throws UnsupportedDirectoryPathException if the path given on the input is problematic
+     * @throws ProblematicPathException if the path given on the input is problematic
      */
     protected function getDirectory()
     {
@@ -117,7 +117,7 @@ class BootstrapCommand extends BaseCommand
 
             try {
                 $dir = $this->validateAndConvertDirectoryPath($dir, $cwd);
-            } catch (UnsupportedDirectoryPathException $e) {
+            } catch (ProblematicPathException $e) {
                 // Set to false to re-prompt for dir
                 $dir = false;
             }
@@ -134,7 +134,7 @@ class BootstrapCommand extends BaseCommand
      *
      * @return SplFileInfo
      *
-     * @throws UnsupportedDirectoryPathException if '~' is used in the path
+     * @throws ProblematicPathException if '~' is used in the path
      */
     protected function validateAndConvertDirectoryPath($dir, $cwd)
     {
